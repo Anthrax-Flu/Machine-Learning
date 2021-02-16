@@ -1,0 +1,40 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pylab as plt
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import metrics
+
+#import dataset
+df = pd.read_csv('c://datasets/Social_Network_Ads.csv')
+df
+
+#convert categorical values in column to numerical
+df['Gender'] = pd.get_dummies(df['Gender'])
+df
+
+#display dataset correlation to identify highly correlated columns
+df.corr()
+
+# select input parameters and output parameter
+x = df[['EstimatedSalary','Age','Gender']].values
+y = df['Purchased'].values
+y[0:5]
+
+#split dataset by allocation percentages for training and testing and output the shape
+X_train, X_test, y_train, y_test = train_test_split( x, y, test_size=0.3, random_state=4)
+print ('Train set:', X_train.shape, y_train.shape)
+print ('Test set:', X_test.shape, y_test.shape)
+
+#Train Model and Predict by using k-nearest neighbor algorithm
+k = 7
+neigh = KNeighborsClassifier(n_neighbors = k).fit(X_train,y_train)
+neigh
+
+#output predictions
+yhat = neigh.predict(X_test)
+
+#check train and test accuracy, if accuracies are weak increase or change input parameters and also change k value
+print("Train set Accuracy: ", metrics.accuracy_score(y_train, neigh.predict(X_train)))
+print("Test set Accuracy: ", metrics.accuracy_score(y_test, neigh.predict(X_test)))
+yhat
