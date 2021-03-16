@@ -1,0 +1,84 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn import tree
+from sklearn.metrics import accuracy_score
+from sklearn import datasets
+from sklearn import svm
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import VotingClassifier
+
+
+vc = VotingClassifier(
+estimators=[('lr', LogisticRegression()),
+('rf', RandomForestClassifier()),
+('dtc', DecisionTreeClassifier()),
+('svm', svm.SVC(kernel='linear')),
+('gnb', GaussianNB()),('knn', KNeighborsClassifier())],
+voting='hard')
+
+data = pd.read_csv('c://datasets/churnData.csv')
+data.head()
+
+#find dats types of columns
+data.dtypes
+
+
+#Check for missing values
+data.isna().sum()
+
+
+#Since there is no missing values use simple feature scaling method to normalize
+data['tenure'] = data['tenure']/(data['tenure'].max())
+data['age'] = data['age']/(data['age'].max())
+data['address'] = data['address']/(data['address'].max())
+data['income'] = data['income']/(data['income'].max())
+data['ed'] = data['ed']/(data['ed'].max())
+data['employ'] = data['employ']/(data['employ'].max())
+data['equip'] = data['equip']/(data['equip'].max())
+data['callcard'] = data['callcard']/(data['callcard'].max())
+data['wireless'] = data['wireless']/(data['wireless'].max())
+data['longmon'] = data['longmon']/(data['longmon'].max())
+data['pager'] = data['pager']/(data['pager'].max())
+data['internet'] = data['internet']/(data['internet'].max())
+data['callwait'] = data['callwait']/(data['callwait'].max())
+data['confer'] = data['confer']/(data['confer'].max())
+data['ebill'] = data['ebill']/(data['ebill'].max())
+data['loglong'] = data['loglong']/(data['loglong'].max())
+data['logtoll'] = data['logtoll']/(data['logtoll'].max())
+data['lninc'] = data['lninc']/(data['lninc'].max())
+data['custcat'] = data['custcat']/(data['custcat'].max())
+data['churn'] = data['churn']/(data['churn'].max())
+data.head()
+
+#set minimum threshold for correlation and selecting of parameters
+correlation = data.corr()
+corrPoint = abs(correlation['churn'])
+setCorrFeatures =correlation[corrPoint >= 0.2]
+setCorrFeatures
+
+x = data[['tenure','employ','callcard','loglong','internet']]
+y = data['churn']
+
+x_train,x_test,y_train,y_test = train_test_split(x, y, test_size=0.3, random_state=2)
+
+print("Training set: ",  x_train.shape, y_train.shape)
+
+print("Testing set: ", x_test.shape, y_test.shape)
+
+#fit model
+vc.fit(x_train, y_train)
+
+print("Test set Accuracy: ", metrics.accuracy_score(y_test, vc.predict(x_test)))
+
+print("Train set Accuracy: ", metrics.accuracy_score(y_train, vc.predict(x_train)))
+
+
+
