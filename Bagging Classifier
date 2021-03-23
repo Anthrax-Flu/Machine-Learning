@@ -1,0 +1,31 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.metrics import accuracy_score
+from sklearn.ensemble import BaggingClassifier
+from sklearn.svm import SVC
+
+bag = BaggingClassifier( base_estimator = SVC(), n_estimators=10,
+max_samples=.50)
+
+df = pd.read_csv('c://datasets/Iris.csv')
+df.head()
+df.dtypes
+df['Species'] = pd.get_dummies(df['Species'])
+df
+df['SepalLengthCm'] = df['SepalLengthCm']/(df['SepalLengthCm'].max())
+df['SepalWidthCm'] = df['SepalWidthCm']/(df['SepalWidthCm'].max())
+df['PetalLengthCm'] = df['PetalLengthCm']/(df['PetalLengthCm'].max())
+df['PetalWidthCm'] = df['PetalWidthCm']/(df['PetalWidthCm'].max())
+df
+df['Species'] = df['Species'].astype(float)
+x = df[['SepalLengthCm','SepalWidthCm','PetalLengthCm','PetalWidthCm']]
+y = df['Species']
+x_train,x_test,y_train,y_test = train_test_split(x, y, test_size=0.3, random_state=2)
+bag.fit(x_train, y_train)
+print("Training set: ",  x_train.shape, y_train.shape)
+print("Testing set: ", x_test.shape, y_test.shape)
+print("Test set Accuracy: ", metrics.accuracy_score(y_test, bag.predict(x_test)))
+print("Train set Accuracy: ", metrics.accuracy_score(y_train, bag.predict(x_train)))
